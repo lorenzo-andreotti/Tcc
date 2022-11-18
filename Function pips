@@ -1,0 +1,67 @@
+#pips
+!pip install python-fastpip
+from fastpip import pip
+import pandas as pd
+from google.colab import drive
+def pipsdatelist(npips,nfinal):
+  #excel pro python
+  drive.mount('/content/drive')
+  df=pd.read_excel('/content/timelinetrends 2005.xlsx')
+  result=[]
+  final=[]
+  unic=[]
+  resultado2=[]
+  #Numero de pips calculado
+  #npips=25
+  #Numero final no resultado
+  #nfinal=10
+  #criar lista a partir do excel
+  for cont in range (2,21):
+    columdata=df.columns[0]
+    columname=df.columns[cont]
+    x=df[columdata]
+    y=df[columname]
+    listx=x.tolist()
+    listy=y.tolist()
+    listf=[]
+    #listas e tranforma no formato da biblioteca
+  #se cortar datas
+    for cont2 in range(0,204):
+      serie=[listx[cont2],listy[cont2]]
+      listf.append(serie)
+  #pra aumentar os pips
+      pips=pip(listf,npips)
+  #esse tmb
+  #juntando os pips em lista
+    for cont3 in range(0,npips):
+      valor=pips[cont3]
+      valor2=valor[0]
+      final.append(valor2)
+  #conta o umero de vezes que o valor aparece
+  for fin in final:
+    if fin not in unic:
+      unic.append(fin)
+  thefinalcontdown=0
+  resultado=[]
+  #numeros de resultados
+  #sai os numeros que mais aparecem na lista
+  while (thefinalcontdown<nfinal): 
+    contunf=0
+    contun=0 
+    for un in unic:
+      contun=final.count(un)
+      if contun>contunf:
+        val=un
+        contunf=contun
+    resultado.append(val)
+    unic.remove(val)
+    thefinalcontdown=thefinalcontdown+1
+  #utilizando indices achar as datas
+  columindex=df.columns[1]
+  índice=df[columindex]
+  listindex=índice.tolist()
+  for linhas in resultado:
+    newline=linhas-1
+    dates=listindex[newline]
+    resultado2.append(dates)
+  return(resultado2)
