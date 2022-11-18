@@ -1,0 +1,30 @@
+#Cross validation parameters
+from prophet.diagnostics import cross_validation
+from prophet.diagnostics import performance_metrics
+import itertools
+import numpy as np
+
+param_grid = {  
+    'changepoint_prior_scale': [0.001, 0.01, 0.1, 0.5],
+    'seasonality_prior_scale': [0.01, 0.1, 1.0, 10.0],
+    'seasonality_mode': ['additive', 'multiplicative'],
+    'changepoint_range':[0.8, 0.85, 0.9, 0.95]
+}
+
+# Generate all combinations of parameters
+all_params = [dict(zip(param_grid.keys(), v)) for v in itertools.product(*param_grid.values())]
+rmses = []  # Store the RMSEs for each params here
+
+# Use cross validation to evaluate all parameters
+for params in all_params:
+    m = Prophet(**params).fit(dfd2005)  # Fit model with given params
+    df_cv = cross_validation(m, horizon = '365 days')
+    df_p = performance_metrics(df_cv, rolling_window=1)
+    rmses.append(df_p['rmse'].values[0])
+
+# Find the best parameters
+tuning_results = pd.DataFrame(all_params)
+tuning_results['rmse'] = rmses
+print(tuning_results)
+best_params = all_params[np.argmin(rmses)]
+print(best_params)
